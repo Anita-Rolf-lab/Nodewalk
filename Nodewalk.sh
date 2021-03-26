@@ -103,9 +103,9 @@ do
 	if [ -f "$filep1" ]; then
 		if [ -f "$filep2" ]; then
 		echo "\nFound status of pair-end : OK\n\nStart of Mapping $filep1 using bwa-bwasw"
-		#./bwa bwasw -t 32 $reffa $filep1 | gzip - > $outputDirSam/$f_R1.sam.gz
+		./bwa bwasw -t 32 $reffa $filep1 | gzip - > $outputDirSam/$f_R1.sam.gz
 		echo "Start of Mapping $filep2 using bwa-bwasw\n"
-		#./bwa bwasw -t 32 $reffa $filep1 | gzip - > $outputDirSam/$f_R2.sam.gz
+		./bwa bwasw -t 32 $reffa $filep1 | gzip - > $outputDirSam/$f_R2.sam.gz
 		echo "Computing Nodewalk\n"
 		python ProcessNWSam_V3.py $f $renzyme $pdef $reffa $inputDir $outputDirSam $outputDirStats
 		echo "\nProcessing of $f is finished\n"
