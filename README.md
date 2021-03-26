@@ -20,6 +20,7 @@ For complete input of the arguments please write the following command:
 
 
 Run with the detault settings: nw.sh
+\n
 Detail of folder structure in detault settings
 -i: UPLOADS/NW_ST1
 -s: UPLOADS/NW_ST2
