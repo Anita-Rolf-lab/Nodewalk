@@ -4,8 +4,7 @@
 Nodewalk Analysis Pipeline (NAP) provides tools to map, analyse and identify interactors from the results generated from Nodewalk Experiment. 
 
 Requirement: 
-a.	BWA (version)
-b.	Python (version)
+a.	Python (version)
 **c.**	
 
 
