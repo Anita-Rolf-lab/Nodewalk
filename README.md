@@ -5,7 +5,8 @@ Nodewalk Analysis Pipeline (NAP) provides tools to map, analyse and identify int
 
 Requirement: 
 a.	Python (version)
-**c.**	
+Install the following libraries:
+
 
 
 Input Datasets: 
@@ -34,11 +35,11 @@ Five files are generated as output:
 Fragstats.tab has the following collumns:
 SAMP: Sample name
 Frag: Interactor name: Format:
-GENOME: 
-CHROMO	
-FragStart	
-FragEnd	
-PROBE 
+GENOME: For eg., HG19
+CHROMO: Eg., chr1
+FragStart: start position of interactor
+FragEnd: end position of interactor
+PROBE: Probe name 
 ProbeChromo	
 ProbePosition	
 ProbeGenome	
@@ -73,7 +74,7 @@ ctTot provides the measure of the total number of valid reads. This measurement 
 
 
 
-nodewalk pipeline to analyze the data using our in lab developed protocol The Nodewalk.sh is containing bash script to align your multiple compressed fastq.gz file and then analyze the Nodewalk analysis. you may run the code using the following default settings:
+The Nodewalk.sh calls BWA to align fastq.gz file and then call interactors. You may run the code using the following default settings:
 
 
 **USAGE**
@@ -86,7 +87,7 @@ sh Nodewalk.sh help
 
 Use of the Nodewalk pipeline
 
--i : Input fastq.gz directory 
+-i : Input fastq.gz directory (The code will run all the fastq files in the directory. If only one fastq files needs to processed, please place that in a separate directory and provide the path.)
 -s : Output Sam directory 
 -a : Reference Genome in .fa extension 
 -p : Prob defination in .py extension 
