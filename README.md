@@ -10,8 +10,6 @@ Module Bio.Seq
 Modules Time, gzip, itertools, sys, json, pysam, distance
  
 
-
-
 Input Datasets: 
 a.	The FASTQ files generated from the Nodewalk wet-lab protocol are the starting inputs for the Nodewalk Analysis Pipeline. 
 Supportive file formats : Compressed FASTQ files (fastq.gz)
@@ -36,8 +34,8 @@ Five files are generated as output:
 5.	Example.ValidCovStats.tab
 
 Fragstats.tab has 24 columns. The details of the columns mainly used for analysing the interactors are:
-(Numbers mentioned here are the column numbers in the output file)
-1. SAMP: Sample name
+(Column Numbers are mentioned in the brackets)
+1. SAMP: Sample name (1)
 2. Frag: Interactor name: Format:
 3. GENOME: For eg., HG19
 4. CHROMO: Eg., chr1
@@ -47,7 +45,7 @@ Fragstats.tab has 24 columns. The details of the columns mainly used for analysi
 8. ProbeChromo	
 9. ProbePosition	
 10. ProbeGenome	
-14. ctpos: Approximate number of digested reads
+14. ctpos: Approximate number of digested reads (14)
 
 
 1)	**Mapping and Pre-processing **
