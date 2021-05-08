@@ -4,8 +4,11 @@
 Nodewalk Analysis Pipeline (NAP) provides tools to map, analyse and identify interactors from the results generated from Nodewalk Experiment. 
 
 Requirement: 
-a.	Python3
-Install the following libraries:
+a.	Python3 and its packagaes and modules
+Packages: Bio.SeqIO, Levenshtein
+Module Bio.Seq 
+Modules Time, gzip, itertools, sys, json, pysam, distance
+ 
 
 
 
@@ -32,31 +35,19 @@ Five files are generated as output:
 4.	Example.UmiStats.tab
 5.	Example.ValidCovStats.tab
 
-Fragstats.tab has the following collumns:
-SAMP: Sample name
-Frag: Interactor name: Format:
-GENOME: For eg., HG19
-CHROMO: Eg., chr1
-FragStart: start position of interactor
-FragEnd: end position of interactor
-PROBE: Probe name 
-ProbeChromo	
-ProbePosition	
-ProbeGenome	
-LT10	
-LT30	
-GT30	
-ctpos	
-ctPos5	
-ctPos10	
-ctumi	
-ctUmi5	
-ctUmi10	
-maxPrbMatches	
-maxPrbOverPos	
-maxPrbTp	
-Positions	
-Umis
+Fragstats.tab has 24 columns. The details of the columns mainly used for analysing the interactors are:
+(Numbers mentioned here are the column numbers in the output file)
+1. SAMP: Sample name
+2. Frag: Interactor name: Format:
+3. GENOME: For eg., HG19
+4. CHROMO: Eg., chr1
+5. FragStart: start position of interactor
+6. FragEnd: end position of interactor
+7. PROBE: Probe name 
+8. ProbeChromo	
+9. ProbePosition	
+10. ProbeGenome	
+14. ctpos: Approximate number of digested reads
 
 
 1)	**Mapping and Pre-processing **
@@ -64,7 +55,7 @@ Umis
 Paired-end reads are independently mapped using bwa version (##) to the reference genome in .fa format. 
 The original Nodewalk pipeline utilizes a merged reference genome composed of phiX174, Drosophila (BDGP5.65), Escherichia coli K12 and human (GRCh37.75) genomes. 
 
-The resulting sam files are compressed and provided as an input into the pre-processing python script (PreProcess.py) along with the definition of the probe coordinates. Briefly, alignments with mapping quality greater than 10 of the second read were used to determine probe position. An extension region (extending from the probe’s end to the first restriction site) was used to discriminate valid from mis-annealing events. The total number of alignments in the first read with the proper probe extension in the second read was reported by restriction fragment.
+The resulting SAM files are compressed and provided as an input into the pre-processing python script (PreProcess.py) along with the definition of the probe coordinates. Briefly, alignments with mapping quality greater than 10 of the second read were used to determine probe position. An extension region (extending from the probe’s end to the first restriction site) was used to discriminate valid from mis-annealing events. The total number of alignments in the first read with the proper probe extension in the second read was reported by restriction fragment.
 
 
 2)	**Analysis**
@@ -79,18 +70,18 @@ The Nodewalk.sh calls BWA to align fastq.gz file and then call interactors. You 
 
 **USAGE**
 
-sh Nodewalk.sh
+sh Nodewalk_V2.sh
 
 For complete input of the arguments please write the following command:
 
-sh Nodewalk.sh help
+sh Nodewalk_V2.sh help
 
 Use of the Nodewalk pipeline
 
--i : Input fastq.gz directory (The code will run all the fastq files in the directory. If only one fastq files needs to processed, please place that in a separate directory and provide the path.)
+-i : Input fastq.gz directory 
 -s : Output Sam directory 
 -a : Reference Genome in .fa extension 
--p : Prob defination in .py extension 
+-p : Probe definition in .py extension 
 -r : Restriction Enzyme 
 -o : Output Stats Directory
 
