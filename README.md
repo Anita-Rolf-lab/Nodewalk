@@ -28,7 +28,9 @@ b.	Reference Genome
 c.	Sequence of recognition site for restriction enzyme used. For eg., AAGCTT is the recognition site for HindIII
 d.	Probe definition file. The format is as follows:
 
-["Probe Name","chr#", "strand", probestart, probe-end, "Probe-Sequence", "GenomeVersion (eg., HG19)"]
+"Probe Name":["Probe Name","chr#", "strand", probestart, probe-end, "Probe-Sequence", "GenomeVersion (eg., HG19)"]
+
+Different probe definitions are separated by comma.
 
 Output Files:
 Five files are generated as output:
@@ -55,7 +57,7 @@ Fragstats.tab has 24 columns. The details of the columns mainly used for analysi
 
 1)	**Mapping and Pre-processing **
 
-Paired-end reads are independently mapped using bwa to the reference genome in .fa format (the executable of bwa is provided along with the code).
+Paired-end reads are independently mapped using BWA to the reference genome in .fa format (the executable of BWA is provided along with the code).
 The original Nodewalk pipeline utilizes a merged reference genome composed of phiX174, Drosophila (BDGP5.65), Escherichia coli K12 and human (GRCh37.75) genomes. 
 
 The resulting SAM files are compressed and provided as an input into the pre-processing python script (PreProcess.py) along with the definition of the probe coordinates. Briefly, alignments with mapping quality greater than 10 of the second read were used to determine probe position. An extension region (extending from the probe’s end to the first restriction site) was used to discriminate valid from mis-annealing events. The total number of alignments in the first read with the proper probe extension in the second read was reported by restriction fragment.
