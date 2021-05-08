@@ -4,7 +4,7 @@
 Nodewalk Analysis Pipeline (NAP) provides tools to map, analyse and identify interactors from the results generated from Nodewalk Experiment. 
 
 Requirement: 
-a.	Python (version)
+a.	Python3
 Install the following libraries:
 
 
@@ -94,17 +94,6 @@ Use of the Nodewalk pipeline
 -r : Restriction Enzyme 
 -o : Output Stats Directory
 
-Run with the detault settings: nw.sh 
 
-Detail of folder structure in detault settings 
-
--i: UPLOADS/NW_ST1 
--s: UPLOADS/NW_ST2 
--a: Genomes/HG19_BDGP5_PhiX_K12.fa 
--p: PROBE_DEFS/NWProbeDef171116.py 
--r: AAGCTT 
--o: UPLOADS/STATS
-
-The pipeline will not create any directory, please create your exact directory structure to execute the pipeline.
 
 For help and assistance: rashid.mehmood@ki.se
