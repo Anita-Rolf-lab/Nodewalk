@@ -41,12 +41,12 @@ if [  -n "$1" ]
 		echo "\n Optional"
 		echo "\t-s : Output Sam directory, Optional"
 		echo "\t-r : Restricted Enzyme"
-		echo "\t-p : Prob defination in .py extension"
+		echo "\t-p : Probe definition in .py extension"
 		echo "\t-o : Output Stats Directory, Optional"	
 			
 		
-		echo "\n\nRun with the detault settings: nw.sh"
-		echo "Detail of folder structure in detault settings"
+		echo "\n\nRun with the default settings: nw.sh"
+		echo "Detail of folder structure in default settings"
 		echo "-i: $inputDir"
 		echo "-s: $outputDirSam"
 		echo "-a: $reffa"		
@@ -57,22 +57,22 @@ if [  -n "$1" ]
 	fi
 
 fi
-echo "\n*************Provided/detaul Settings************************\n"
+echo "\n*************Provided/Default Parameters************************\n"
 echo "Input fastq.gz directory: $inputDir"
-echo "Output Sam directory: $outputDirSam"
+echo "Output SAM directory: $outputDirSam"
 echo "Input reference genome .fa : $reffa"
 
-echo "Prob Definition: $pdef"
-echo "Restricted Enzyme : $renzyme"
+echo "Probe Definition: $pdef"
+echo "Restriction Enzyme: $renzyme"
 
 echo "Output Stats Directory :$outputDirStats"
 
 echo "\n\nValidating Provided Directory and files\n\n";
-if [ ! -d "$inputDir" ]; then echo "Error, Directory of input fastq.gz files  '$inputDir' DOES NOT exists.\n";  exit 9999; fi
-if [ ! -d "$outputDirSam" ]; then echo "Error, Directory of output sam files  '$outputDirSam' DOES NOT exists.\n";  exit 9999; fi
-if [ ! -d "$outputDirStats" ]; then echo "Error, Directory of output STATs   '$outputDirStats' DOES NOT exists.\n";  exit 9999; fi
-if [ ! -f "$reffa" ]; then echo "Reference genome $reffa does not exist on your filesystem.\n"; exit 9999; fi
-if [ ! -f "$pdef" ]; then echo "Prob definition $pdef does not exist on your filesystem.\n"; exit 9999; fi
+if [ ! -d "$inputDir" ]; then echo "Error, Directory of input fastq.gz files '$inputDir' DOES NOT exist\n";  exit 9999; fi
+if [ ! -d "$outputDirSam" ]; then echo "Error, Directory of output sam files '$outputDirSam' DOES NOT exist\n";  exit 9999; fi
+if [ ! -d "$outputDirStats" ]; then echo "Error, Directory of output STATs '$outputDirStats' DOES NOT exist\n";  exit 9999; fi
+if [ ! -f "$reffa" ]; then echo "Reference genome $reffa does not exist\n"; exit 9999; fi
+if [ ! -f "$pdef" ]; then echo "Probe definition file $pdef does not exist\n"; exit 9999; fi
 
 
 
