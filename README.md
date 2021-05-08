@@ -5,14 +5,18 @@ Nodewalk Analysis Pipeline (NAP) provides tools to map, analyse and identify int
 
 Requirement: 
 a.	Python3 and its packagaes and modules
+
 Packages: Bio.SeqIO, Levenshtein
+
 Module Bio.Seq 
+
 Modules Time, gzip, itertools, sys, json, pysam, distance
  
 
 Input Datasets: 
 a.	The FASTQ files generated from the Nodewalk wet-lab protocol are the starting inputs for the Nodewalk Analysis Pipeline. 
 Supportive file formats : Compressed FASTQ files (fastq.gz)
+
 To detect the pair-end files, a naming convention is followed: The pairs should have suffix
 _R1 and _R2 followed by the extension .fastq.gz.
 
@@ -23,7 +27,8 @@ example1_R2.fastq.gz
 b.	Reference Genome 
 c.	Sequence of recognition site for restriction enzyme used. For eg., AAGCTT is the recognition site for HindIII
 d.	Probe definition file. The format is as follows:
-"Probe Name":	["Probe Name","chr#", "strand", probestart, probe-end, "Probe-Sequence", "GenomeVersion (eg., HG19)"]
+
+["Probe Name","chr#", "strand", probestart, probe-end, "Probe-Sequence", "GenomeVersion (eg., HG19)"]
 
 Output Files:
 Five files are generated as output:
