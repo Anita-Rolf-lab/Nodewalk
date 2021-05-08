@@ -34,9 +34,9 @@ Five files are generated as output:
 5.	Example.ValidCovStats.tab
 
 Fragstats.tab has 24 columns. The details of the columns mainly used for analysing the interactors are:
-(Column Numbers are mentioned in the brackets)
-1. SAMP: Sample name (1)
-2. Frag: Interactor name: Format:
+
+1. SAMP: Sample name 
+2. Frag: Interactor name: Format: **Genome:chr:FragStart+Length** (Eg: HG19:chr8:128207867+18243)
 3. GENOME: For eg., HG19
 4. CHROMO: Eg., chr1
 5. FragStart: start position of interactor
@@ -45,12 +45,12 @@ Fragstats.tab has 24 columns. The details of the columns mainly used for analysi
 8. ProbeChromo	
 9. ProbePosition	
 10. ProbeGenome	
-14. ctpos: Approximate number of digested reads (14)
+11. ctpos: Approximate number of digested reads (Column No: 14)
 
 
 1)	**Mapping and Pre-processing **
 
-Paired-end reads are independently mapped using bwa version (##) to the reference genome in .fa format. 
+Paired-end reads are independently mapped using bwa to the reference genome in .fa format (the executable of bwa is provided along with the code).
 The original Nodewalk pipeline utilizes a merged reference genome composed of phiX174, Drosophila (BDGP5.65), Escherichia coli K12 and human (GRCh37.75) genomes. 
 
 The resulting SAM files are compressed and provided as an input into the pre-processing python script (PreProcess.py) along with the definition of the probe coordinates. Briefly, alignments with mapping quality greater than 10 of the second read were used to determine probe position. An extension region (extending from the probe’s end to the first restriction site) was used to discriminate valid from mis-annealing events. The total number of alignments in the first read with the proper probe extension in the second read was reported by restriction fragment.
@@ -85,4 +85,4 @@ Use of the Nodewalk pipeline
 
 
 
-For help and assistance: rashid.mehmood@ki.se
+For help and assistance: rashid.mehmood@ki.se, anita.gondor@ki.se
