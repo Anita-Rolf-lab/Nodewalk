@@ -19,10 +19,10 @@ done
 
 if [ -z "$inputDir" ]; then inputDir="UPLOADS/NW_ST1"; fi
 
-if [ -z "$outputDirSam" ]; then mkdir "$inputDir/NW_ST2"; outputDirSam="$inputDir/NW_ST2"; fi
+if [ -z "$outputDirSam" ]; then outputDirSam="$inputDir/NW_ST2"; fi
 if [ -z "$reffa" ]; then reffa="Genomes/HG19_BDGP5_PhiX_K12.fa"; fi
 
-if [ -z "$outputDirStats" ]; then mkdir "$inputDir/STATS"; outputDirStats="$inputDir/STATS"; fi
+if [ -z "$outputDirStats" ]; then  outputDirStats="$inputDir/STATS"; fi
 
 
 if [ -z "$pdef" ]; then pdef="PROBE_DEFS/NWProbeDef171116.py"; fi
@@ -41,12 +41,12 @@ if [  -n "$1" ]
 		echo "\n Optional"
 		echo "\t-s : Output Sam directory, Optional"
 		echo "\t-r : Restricted Enzyme"
-		echo "\t-p : Probe definition in .py extension"
+		echo "\t-p : Prob defination in .py extension"
 		echo "\t-o : Output Stats Directory, Optional"	
 			
 		
-		echo "\n\nRun with the default settings: nw.sh"
-		echo "Detail of folder structure in default settings"
+		echo "\n\nRun with the detault settings: nw.sh"
+		echo "Detail of folder structure in detault settings"
 		echo "-i: $inputDir"
 		echo "-s: $outputDirSam"
 		echo "-a: $reffa"		
@@ -54,25 +54,29 @@ if [  -n "$1" ]
 		echo "-r: $renzyme"
 		echo "-o: $outputDirStats"
 		exit
+	
 	fi
 
 fi
-echo "\n*************Provided/Default Parameters************************\n"
+if [ -z "$outputDirSam" ]; then mkdir "$inputDir/NW_ST2"; outputDirSam="$inputDir/NW_ST2"; fi
+if [ -z "$outputDirStats" ]; then mkdir "$inputDir/STATS"; outputDirStats="$inputDir/STATS"; fi
+
+echo "\n*************Provided/detaul Settings************************\n"
 echo "Input fastq.gz directory: $inputDir"
-echo "Output SAM directory: $outputDirSam"
+echo "Output Sam directory: $outputDirSam"
 echo "Input reference genome .fa : $reffa"
 
-echo "Probe Definition: $pdef"
-echo "Restriction Enzyme: $renzyme"
+echo "Prob Definition: $pdef"
+echo "Restricted Enzyme : $renzyme"
 
 echo "Output Stats Directory :$outputDirStats"
 
 echo "\n\nValidating Provided Directory and files\n\n";
-if [ ! -d "$inputDir" ]; then echo "Error, Directory of input fastq.gz files '$inputDir' DOES NOT exist\n";  exit 9999; fi
-if [ ! -d "$outputDirSam" ]; then echo "Error, Directory of output sam files '$outputDirSam' DOES NOT exist\n";  exit 9999; fi
-if [ ! -d "$outputDirStats" ]; then echo "Error, Directory of output STATs '$outputDirStats' DOES NOT exist\n";  exit 9999; fi
-if [ ! -f "$reffa" ]; then echo "Reference genome $reffa does not exist\n"; exit 9999; fi
-if [ ! -f "$pdef" ]; then echo "Probe definition file $pdef does not exist\n"; exit 9999; fi
+if [ ! -d "$inputDir" ]; then echo "Error, Directory of input fastq.gz files  '$inputDir' DOES NOT exists.\n";  exit 9999; fi
+if [ ! -d "$outputDirSam" ]; then echo "Error, Directory of output sam files  '$outputDirSam' DOES NOT exists.\n";  exit 9999; fi
+if [ ! -d "$outputDirStats" ]; then echo "Error, Directory of output STATs   '$outputDirStats' DOES NOT exists.\n";  exit 9999; fi
+if [ ! -f "$reffa" ]; then echo "Reference genome $reffa does not exist on your filesystem.\n"; exit 9999; fi
+if [ ! -f "$pdef" ]; then echo "Prob definition $pdef does not exist on your filesystem.\n"; exit 9999; fi
 
 
 
@@ -104,13 +108,13 @@ for f in $unqpre
 do
 	echo "using prefix $f checking the existance of both pair-end files"
 	filep1=$inputDir/"$f"_R1.fastq.gz
-	filep2=$inputDir/"$f"_R1.fastq.gz
+	filep2=$inputDir/"$f"_R2.fastq.gz
 	if [ -f "$filep1" ]; then
 		if [ -f "$filep2" ]; then
 		echo "\nFound status of pair-end : OK\n\nStart of Mapping $filep1 using bwa-bwasw"
 		./bwa bwasw -t 32 $reffa $filep1 | gzip - > $outputDirSam/$f"_R1.sam.gz"
 		echo "Start of Mapping $filep2 using bwa-bwasw\n"
-		./bwa bwasw -t 32 $reffa $filep1 | gzip - > $outputDirSam/$f"_R2.sam.gz"
+		./bwa bwasw -t 32 $reffa $filep2 | gzip - > $outputDirSam/$f"_R2.sam.gz"
 		echo "Computing Nodewalk\n"
 		python ProcessNWSam_V3.py $f $renzyme $pdef $reffa $inputDir $outputDirSam $outputDirStats
 		echo "\nProcessing of $f is finished\n"
@@ -126,5 +130,4 @@ do
 done
 
 echo "$flag Libraries have been processed, finished"
-
 
