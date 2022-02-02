@@ -1,4 +1,4 @@
-while getopts "i:s:a:o:h:p:r:" option; do
+while getopts "i:s:a:b:o:h:p:r:" option; do
   case $option in
     i ) inputDir=$OPTARG
     ;;
@@ -14,6 +14,8 @@ while getopts "i:s:a:o:h:p:r:" option; do
     ;;
  r ) renzyme=$OPTARG
     ;;
+ b ) baitseq=$OPTARG
+    ;;
   esac
 done
 
@@ -27,6 +29,7 @@ if [ -z "$outputDirStats" ]; then  outputDirStats="$inputDir/STATS"; fi
 
 if [ -z "$pdef" ]; then pdef="PROBE_DEFS/NWProbeDef171116.py"; fi
 if [ -z "$renzyme" ]; then renzyme="AAGCTT"; fi
+if [ -z "$baitseq" ]; then baitseq="GTCTATGTACTTGTGAATTATTTCACGT"; fi
 
 if [  -n "$1" ]
  then
@@ -39,16 +42,19 @@ if [  -n "$1" ]
 		echo "\t-a : Reference Genome in .fa extension"
 
 		echo "\n Optional"
+                echo "\t-b : Bait sequence "
 		echo "\t-s : Output Sam directory, Optional"
 		echo "\t-r : Restricted Enzyme"
 		echo "\t-p : Prob defination in .py extension"
 		echo "\t-o : Output Stats Directory, Optional"	
+              
 			
 		
 		echo "\n\nRun with the detault settings: nw.sh"
 		echo "Detail of folder structure in detault settings"
 		echo "-i: $inputDir"
 		echo "-s: $outputDirSam"
+		echo "-b: $baitseq"
 		echo "-a: $reffa"		
 		echo "-p: $pdef"
 		echo "-r: $renzyme"
@@ -82,6 +88,7 @@ echo "Prob Definition: $pdef"
 echo "Restricted Enzyme : $renzyme"
 
 echo "Output Stats Directory :$outputDirStats"
+echo "Bait sequence :$baitseq"
 
 echo "\n\nValidating Provided Directory and files\n\n";
 if [ ! -d "$inputDir" ]; then echo "Error, Directory of input fastq.gz files  '$inputDir' DOES NOT exists.\n";  exit 9999; fi
@@ -128,8 +135,8 @@ do
 		echo "Start of Mapping $filep2 using bwa-bwasw\n"
 		./bwa bwasw -t 32 $reffa $filep2 | gzip - > $outputDirSam/$f"_R2.sam.gz"
 		echo "Computing Nodewalk\n"
-		python nodewalk_github_v1.py $f $renzyme $pdef $reffa $inputDir $outputDirSam $outputDirStats
-		#python ProcessNWSam_chimeric.py $f $renzyme $pdef $reffa $inputDir $outputDirSam $outputDirStats
+		python nodewalk_github_v1.py $f $renzyme $pdef $reffa $inputDir $outputDirSam $outputDirStats $baitseq
+		#python ProcessNWSam_chimeric.py $f $renzyme $pdef $reffa $inputDir $outputDirSam $outputDirStats 
 		echo "\nProcessing of $f is finished\n"
 		flag=$((flag+1))
 

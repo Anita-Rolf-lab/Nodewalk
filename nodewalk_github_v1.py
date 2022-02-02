@@ -18,9 +18,10 @@ import os
 
 
 # In[13]:
+hg19_list = ['HG19:chr1' , 'HG19:chr10' , 'HG19:chr11' , 'HG19:chr12' , 'HG19:chr13' , 'HG19:chr14' , 'HG19:chr15' , 'HG19:chr16' , 'HG19:chr17' , 'HG19:chr18' , 'HG19:chr19' , 'HG19:chr2' , 'HG19:chr20' , 'HG19:chr21' , 'HG19:chr22' , 'HG19:chr3' , 'HG19:chr4' , 'HG19:chr5' , 'HG19:chr6' , 'HG19:chr7' , 'HG19:chr8' , 'HG19:chr9' , 'HG19:chrX' , 'HG19:chrY']
+#baitseq='GTCTATGTACTTGTGAATTATTTCACGT'
 
-
-baitseq='GTCTATGTACTTGTGAATTATTTCACGT'
+baitseq = sys.argv[8]
 
 samp=sys.argv[1]
 RE=sys.argv[2]
@@ -37,10 +38,11 @@ outputDirStats = sys.argv[7]
 
 
 
-
+#print("here is the bait sequence we got "+baitseq)
+#exit()
 #print(prbsALL)
 
-print('argument',samp,'argument2',RE,'argument3','not_include','arg4',RefGenome,'inputdir',inputDir,'samdir',outputDirSam,'outstats',outputDirStats)
+#print('argument',samp,'argument2',RE,'bait seq',baitseq,'argument3','not_include','arg4',RefGenome,'inputdir',inputDir,'samdir',outputDirSam,'outstats',outputDirStats)
 #exit()
 
 useUMI=False
@@ -497,12 +499,12 @@ for [rdid,flag,genome, chromo,xstart, xend,mapq,mapqbin, seq, sam] in SamReader(
     
     #[a,b,frgstart,fragend,tp]
     [a,b,frgstart,fragend,tp] =  CheckProbe(chromo,xstart,xend, flag,seq)
-    
-    if chromo != "NA":
+    sliceflag = genome+":"+chromo    
+    if chromo != "NA" and sliceflag in hg19_list:
        valid[rdid] = valid_R2_getstate[rdid]
        a = valid_R2_getstate[rdid]
        valid_R2[rdid]= chromo+'\t'+str(xstart)+'\t'+str(xend)+'\t'+str(mapq)+'\t'+str(mapqbin)+"\t"+str(chromo)+"\t"+genome+"\t"+flag+"\t"+"0"
-       valid_R2_seq[rdid] = sam
+       valid_R2_seq[rdid] = seq
        #print(chromo)
        #if(mapqbin!="GT30" and mapqbin!="LT30" ):
           #  print(mapqbin)
@@ -532,7 +534,8 @@ ValidCov={}
 flag_c=0
 flag_c2=0
 for [rdid,flag,genome, chromo,xstart, xend,mapq, mapqbin, seq, sam] in SamReader(fl):
-    
+
+    R1_hind3_val=0;    
     flag_R1_n =0
     flag_R1_ex =0;
     flag_R2_n=0;
@@ -552,7 +555,11 @@ for [rdid,flag,genome, chromo,xstart, xend,mapq, mapqbin, seq, sam] in SamReader
        statsLib[statid] += 1
     else: 
        statsLib[statid] = 1
-    if isValid and mapqbin not in ["BlackHole", "UNKNOWN","UNMAPPED", "AMB", "LT10"]:
+    
+    sliceflag = genome+":"+chromo
+    if isValid and seq.count(baitseq)>0 and valid_R2_seq[rdid].count(baitseq)>0 :
+       print("bait sequence is there in both reads and ignoring...............")
+    elif isValid and mapqbin not in ["BlackHole", "UNKNOWN","UNMAPPED", "AMB", "LT10"] and sliceflag in hg19_list:
         
         
     
@@ -579,7 +586,10 @@ for [rdid,flag,genome, chromo,xstart, xend,mapq, mapqbin, seq, sam] in SamReader
        R2_inside_hint =   valid_R2[rdid].split('\t')[8]
        R2_seq =  valid_R2_seq[rdid]
       # R2_seq = R2_seq[9:30]
-    
+      
+       if seq.count(RE)>0:
+         R1_hind3_val = seq.count(RE)   
+     
        lt30=0
        gt30=0
         
@@ -634,17 +644,16 @@ for [rdid,flag,genome, chromo,xstart, xend,mapq, mapqbin, seq, sam] in SamReader
           ValidCov[vstat] += 1 
        entryid = frg[0] + "\t" + prb
        if not entryid in statsFrags: 
-          statsFrags[entryid] = {"LT10":0, "LT30":0, "GT30":0, "RE_Start":frg[1], "RE_End":frg[2], "eRE_Start":frg2[1], "eRE_End":frg3[2],"R1_nFrg":flag_R1_n,"R1_extFrg":flag_R1_ex,"R2_nFrg":flag_R2_n,"R2_extFrg":flag_R2_ext,"cov":{},"cov2":{},"umi":{},"nfrag":cflag_n,"efrag":cflag_ex,"R2_fragment":{}}
+          statsFrags[entryid] = {"LT10":0, "LT30":0, "GT30":0, "RE_Start":frg[1], "RE_End":frg[2], "eRE_Start":frg2[1], "eRE_End":frg3[2],"R1_nFrg":flag_R1_n,"R1_extFrg":flag_R1_ex,"R2_nFrg":flag_R2_n,"R2_extFrg":flag_R2_ext,"cov":{},"cov2":{},"umi":{},"nfrag":cflag_n,"efrag":cflag_ex,"R2_fragment":{},"R1_Hind3":R1_hind3_val}
        else:
           statsFrags[entryid]["nfrag"] = statsFrags[entryid]["nfrag"]+cflag_n
-          statsFrags[entryid]["efrag"] = statsFrags[entryid]["efrag"]+cflag_ex        
+          statsFrags[entryid]["efrag"] = statsFrags[entryid]["efrag"]+cflag_ex
           statsFrags[entryid]["R1_nFrg"] = statsFrags[entryid]["R1_nFrg"]+flag_R1_n
           statsFrags[entryid]["R1_extFrg"] = statsFrags[entryid]["R1_extFrg"]+flag_R1_ex
           statsFrags[entryid]["R2_nFrg"] = statsFrags[entryid]["R2_nFrg"]+flag_R2_n
           statsFrags[entryid]["R2_extFrg"] = statsFrags[entryid]["R2_extFrg"]+flag_R2_ext
-        
-        
-       #if (cflag_n==0):
+          statsFrags[entryid]["R1_Hind3"] = statsFrags[entryid]["R1_Hind3"]+R1_hind3_val
+#if (cflag_n==0):
        #   with open('output/'+samp+'.sam', 'a+') as the_file:
         #     the_file.write((R2_seq))
        #-----------------------------Updating the files according to anita told Us
@@ -721,7 +730,6 @@ print(flag_c)
 
 # In[11]:
 
-
 ############################################################################################################################
 ## Write Results
 ############################################################################################################################
@@ -729,34 +737,35 @@ print(flag_c)
 #print ("Writing Stats: " +samp)
 
 
-out = open(outputDirStats+"/"+samp+filewritename+"_ProbeStats.tab","w")
-for x in statsPrbs: 
-    out.write(samp + "\t" + x + "\t" + str(statsPrbs[x]) + "\n")
+#out = open(outputDirStats+"/"+samp+filewritename+"_ProbeStats.tab","w")
+#for x in statsPrbs: 
+#    out.write(samp + "\t" + x + "\t" + str(statsPrbs[x]) + "\n")
 
-out.close()
+#out.close()
 
-out_chimeric = open(outputDirStats+"/"+samp+filewritename+"_Chimaric_fragstats.tab","w")
+out_chimeric = open(outputDirStats+"/"+samp+filewritename+"_Chimeric_fragstats.tab","w")
 
 
-out_chimeric.write( "\t".join(["SAMP","R1_Frag",  "R1_GENOME","R1_CHROMO", "R1_FragStart","R1_FragEnd","R2_Frag","R2_FragStart","R2_FragEnd","R2_GT30",'R2_LT30','R2_ctTot',"R2_ctPos","ctPos_c","R2_hind3_reads","Is chimeric","\n"]))
+out_chimeric.write( "\t".join(["SAMP","R1_Frag","R1_CHROMO", "R1_FragStart","R1_FragEnd","R2_Frag","R2_CHROMO","R2_FragStart","R2_FragEnd","ctTot chimeric read","ctPos chimeric read","\n"]))
 
 
 
 #out = open("../UPLOADS/STATS/"+samp+"_ReadStats.tab","w")
-out = open(outputDirStats+"/"+samp+filewritename+"_ReadStats.tab","w")
-for x in statsLib: 
-    out.write(x + "\t" + str(statsLib[x]) + "\n")
+#out = open(outputDirStats+"/"+samp+filewritename+"_ReadStats.tab","w")
+#for x in statsLib: 
+#    out.write(x + "\t" + str(statsLib[x]) + "\n")
 
-out.close()
+#out.close()
 
 #out = open("../UPLOADS/STATS/"+samp+"_FragStats.tab","w")
 out = open(outputDirStats+"/"+samp+filewritename+"_FragStats.tab","w")
-outUMI = open(outputDirStats+"/"+samp+filewritename+"_UmiStats.tab","w")
+#outUMI = open(outputDirStats+"/"+samp+filewritename+"_UmiStats.tab","w")
 #out.write( "\t".join(["SAMP","Frag",  "GENOME","CHROMO", "FragStart","FragEnd","PROBE","ProbeChromo","ProbePosition","ProbeGenome" ,"LT10","LT30","GT30", "ctpos","ctPos5","ctPos10","ctumi","ctUmi5","ctUmi10","maxPrbMatches", "maxPrbOverPos", "maxPrbTp","Positions","Umis"]) + "\n")
 
 # comments of the before meeting with anita 29 dec, 2021
 #out.write( "\t".join(["SAMP","Frag",  "GENOME","CHROMO", "FragStart","FragEnd","PROBE","ProbeChromo","ProbePosition","ProbeGenome","ctTot", "ctpos","R1 Nfrag","R1 ExtFrag","R2 Nfrag","R2_ExtFrag","Is Chimeric","\n"]))
-out.write( "\t".join(["SAMP","Frag",  "GENOME","CHROMO", "R1_FragStart","R1_FragEnd","PROBE","ProbeChromo","ProbePosition","ProbeGenome","R1 ctTot", "R1 ctPos","Is Chimeric","\n"]))
+#out.write( "\t".join(["SAMP","Frag",  "GENOME","CHROMO", "R1_FragStart","R1_FragEnd","PROBE","ProbeChromo","ProbePosition","ProbeGenome","R1 ctTot", "R1 ctPos","Is Chimeric","\n"]))
+out.write( "\t".join(["SAMP","Interactor_Frag","CHROMO", "FragStart","FragEnd","R1 ctTot","R2 ctTot","Total ctTot ","R1 ctPos","R2 ctPos","Total ctPos","Chimeric","\n"]))
 
 
      #     statsFrags[entryid]["nfrag"] = statsFrags[entryid]["R1_nFrg"]+flag_R1_n
@@ -788,6 +797,8 @@ for x in statsFrags:
     
     R2_nfrg_val = frgStats["R2_nFrg"]
     R2_extfrg_val = frgStats["R2_extFrg"]  
+    
+    R1_Hind3_reads_value =  frgStats["R1_Hind3"]  
 
     if (int(nfrag_val)>0 or int(efrag_val)>0):
         nfrag=False
@@ -798,6 +809,12 @@ for x in statsFrags:
     ccflag=0
     
     R1_ctpos_cvalue = len(frgStats["cov"].values())
+    
+    R2_ctToT_val = 0
+    R2_ctToT_val_c = 0
+    R2_ctPos_val = 0
+    
+    Chimeric_f_flag=False
     for item in frgStats["R2_fragment"]:
         
         #print(item+":"+str(frgStats["R2_fragment"][item])+"length of key is "+str(len(frgStats["R2_fragment"])))
@@ -807,6 +824,10 @@ for x in statsFrags:
         R2_frag_info  = item.split('\t')[0];
         R2_GT30 = frgStats["R2_fragment"][item].split(':')[2] 
         R2_LT30 = frgStats["R2_fragment"][item].split(':')[1]
+        
+        R2_ctToT_val = R2_ctToT_val+int(R2_GT30)+int(R2_LT30)
+        #print("the value of both ctToT is"+str(R2_ctToT_val))
+        
         R2_hint3_reads = frgStats["R2_fragment"][item].split(':')[3]
         Ischimeric_val = int(frgStats["R2_fragment"][item].split(':')[4])
         
@@ -815,30 +836,39 @@ for x in statsFrags:
         #print(Ischimeric_count)
         
         cov2value = len(list(v for k,v in frgStats["cov2"].items() if item in k))
+
         
         
-        if Ischimeric_count <1 and Ischimeric_count_ext <1:
+        
+        if Ischimeric_count <1 and Ischimeric_count_ext <1 and frag !='HG19:chr8:128745989+10995':
             Ischimeric_flag=True
-            both_ctpos = (R1_ctpos_cvalue+cov2value)
+            if(int(R2_GT30)>0 or int(R2_LT30)>0 ):
+                both_ctpos = (cov2value)
+                R2_ctToT_val_c = R2_ctToT_val + LT30+GT30
+                out_chimeric.write( "\t".join(map(str,[samp, frag, chromo, FragStart,FragEnd,R2_frag_info,R2_frag_info.split(":")[1],R2_frg_start,R2_frg_end,(int(R2_GT30)+int(R2_LT30)),both_ctpos])) + "\n")
         else:
             Ischimeric_flag=False
             both_ctpos = (cov2value)
-        
-        
+            
+
+
         if(ccflag==0):
-            if(int(R2_GT30)>0 or int(R2_LT30)>0):
-                out_chimeric.write( "\t".join(map(str,[samp, frag,  genome, chromo, FragStart,FragEnd,R2_frag_info,R2_frg_start,R2_frg_end,R2_GT30,R2_LT30,(int(R2_LT30)+int(R2_GT30)), cov2value,both_ctpos,R2_hint3_reads,Ischimeric_flag])) + "\n")
+            if(int(R2_GT30)>0 or int(R2_LT30)>0 ):
+                R2_ctPos_val = R2_ctPos_val+cov2value
+                if Ischimeric_flag:
+                    Chimeric_f_flag = True
+                    #out_chimeric.write( "\t".join(map(str,[samp, frag,  genome, chromo, FragStart,FragEnd,R2_frag_info,R2_frag_info.split(":")[0],R2_frag_info.split(":")[1],R2_frg_start,R2_frg_end,(int(LT30)+int(GT30)+int(R2_GT30)+int(R2_LT30)),(LT30+GT30),R2_GT30,R2_LT30,R2_ctToT_val_c, cov2value,both_ctpos,R2_hint3_reads,Ischimeric_flag])) + "\n")
+                   # out_chimeric.write( "\t".join(map(str,[samp, frag,  genome, chromo, FragStart,FragEnd,R2_frag_info,R2_frag_info.split(":")[0],R2_frag_info.split(":")[1],R2_frg_start,R2_frg_end,(int(LT30)+int(GT30)+int(R2_GT30)+int(R2_LT30)),both_ctpos,R1_Hind3_reads_value ,R2_hint3_reads])) + "\n")
             ccflag=1
         else:
            # cov2value = len(list(v for k,v in frgStats["cov2"].items() if item in k))
             if(int(R2_GT30) >0 or int(R2_LT30)>0):
-                out_chimeric.write( "\t".join(map(str,['...', '...',  '...', '...','...','...',R2_frag_info,R2_frg_start,R2_frg_end,R2_GT30,R2_LT30,(int(R2_LT30)+int(R2_GT30)), cov2value,both_ctpos,R2_hint3_reads,Ischimeric_flag])) + "\n")
+                R2_ctPos_val = R2_ctPos_val+cov2value
+                if Ischimeric_flag :
+                    Chimeric_f_flag=True
+                   # out_chimeric.write( "\t".join(map(str,[samp, frag,  genome, chromo, FragStart,FragEnd,R2_frag_info,R2_frag_info.split(":")[0],R2_frag_info.split(":")[1],R2_frg_start,R2_frg_end,(int(LT30)+int(GT30)+int(R2_GT30)+int(R2_LT30)),both_ctpos,R1_Hind3_reads_value ,R2_hint3_reads])) + "\n")
             
 
-    
-    
-
-    
     ctpos=len(frgStats["cov"])
     if useUMI: 
        ctumi=len(frgStats["umi"])
@@ -881,7 +911,7 @@ for x in statsFrags:
     ctUmi10 = 0
     for u in frgStats["umi"]:  
       xx=[samp,frag,prb,u,str(frgStats["umi"][u]), str(ctpos) ]
-      outUMI.write("\t".join(xx)+"\n") 
+      #outUMI.write("\t".join(xx)+"\n") 
       if frgStats["umi"][u] > 5: 
          xumi += u+":"+str(frgStats["umi"][u])+","
          ctUmi5 += 1
@@ -898,21 +928,21 @@ for x in statsFrags:
     #out.write( "\t".join(map(str,[samp, frag,  genome, chromo, FragStart,FragEnd,prb,probe[1],probe[3],probe[6],(LT30+GT30), ctpos,nfrag,str(int(efrag)+int(nfrag))])) + "\n")
    # out.write( "\t".join(map(str,[samp, frag,  genome, chromo, FragStart,FragEnd,prb,probe[1],probe[3],probe[6],(LT30+GT30), ctpos,R1_nfrg_val,R1_extfrg_val,R2_nfrg_val,R2_extfrg_val,nfrag])) + "\n")
     # lastly updated after anita meeting 27 dec
-    out.write( "\t".join(map(str,[samp, frag,  genome, chromo, FragStart,FragEnd,prb,probe[1],probe[3],probe[6],(LT30+GT30), ctpos,nfrag])) + "\n")
+    out.write( "\t".join(map(str,[samp, frag, chromo, FragStart,FragEnd,(LT30+GT30),R2_ctToT_val,(LT30+GT30+R2_ctToT_val), ctpos, R2_ctPos_val,(ctpos+ R2_ctPos_val),Chimeric_f_flag])) + "\n")
 
    # out.write( "\t".join(map(str,[samp, frag,  genome, chromo, FragStart,FragEnd,prb,probe[1],probe[3],probe[6],LT10,LT30,GT30, ctpos,ctPos5,ctPos10, ctumi,ctUmi5,ctUmi10, maxPrbMatches, maxPrbOverPos, maxPrbTp, xpos, xumi])) + "\n")
 
 
 out.close()
-outUMI.close()
+#outUMI.close()
 
-out = open(outputDirStats+"/"+samp+"_ValidCovStats.tab","w")
-for x in ValidCov: 
-  ln= x+"\t"+str(ValidCov[x])+"\n"
-  out.write(ln)
+#out = open(outputDirStats+"/"+samp+"_ValidCovStats.tab","w")
+#for x in ValidCov: 
+# # ln= x+"\t"+str(ValidCov[x])+"\n"
+#  out.write(ln)
 
 out.close()
 out_chimeric.close()
-os.remove(inputDir+'/'+samp+'_Chimeric.sam.gz')
+os.remove (inputDir+'/'+samp+'_Chimeric.sam.gz')
 print("Done")
 
