@@ -627,10 +627,12 @@ for [rdid,flag,genome, chromo,xstart, xend,mapq, mapqbin, seq, sam] in SamReader
        frg3 = getREFrag(genome+":"+chromo,int(frg[2]+4),RE)
         
        frg = [frg[0].split(':')[0]+":"+frg[0].split(':')[1]+":"+str(frg2[1])+"+"+str(frg3[2]-frg2[1]), frg2[1],frg3[2]]
-        
+       coflag=True  
        if (xstart >=frg[1] and xend <= frg[2] and R2_start >=frg[1] and R2_end <= frg[2]):
             flag_c2 = flag_c2+1
             cflag_ex =1
+            coflag = False
+	    
         
        frg = getREFrag(genome+":"+chromo,int((xstart+xend)/2),RE)
     
@@ -644,7 +646,7 @@ for [rdid,flag,genome, chromo,xstart, xend,mapq, mapqbin, seq, sam] in SamReader
           ValidCov[vstat] += 1 
        entryid = frg[0] + "\t" + prb
        if not entryid in statsFrags: 
-          statsFrags[entryid] = {"LT10":0, "LT30":0, "GT30":0, "RE_Start":frg[1], "RE_End":frg[2], "eRE_Start":frg2[1], "eRE_End":frg3[2],"R1_nFrg":flag_R1_n,"R1_extFrg":flag_R1_ex,"R2_nFrg":flag_R2_n,"R2_extFrg":flag_R2_ext,"cov":{},"cov2":{},"umi":{},"nfrag":cflag_n,"efrag":cflag_ex,"R2_fragment":{},"R1_Hind3":R1_hind3_val}
+          statsFrags[entryid] = {"LT10":0, "LT30":0, "GT30":0, "RE_Start":frg[1], "RE_End":frg[2], "eRE_Start":frg2[1], "eRE_End":frg3[2],"R1_nFrg":flag_R1_n,"R1_extFrg":flag_R1_ex,"R2_nFrg":flag_R2_n,"R2_extFrg":flag_R2_ext,"cov":{},"cov2":{},"cov3":{},"umi":{},"nfrag":cflag_n,"efrag":cflag_ex,"R2_fragment":{},"R1_Hind3":R1_hind3_val}
        else:
           statsFrags[entryid]["nfrag"] = statsFrags[entryid]["nfrag"]+cflag_n
           statsFrags[entryid]["efrag"] = statsFrags[entryid]["efrag"]+cflag_ex
@@ -677,6 +679,21 @@ for [rdid,flag,genome, chromo,xstart, xend,mapq, mapqbin, seq, sam] in SamReader
           statsFrags[entryid]["cov2"][iPos_r2] += 1
        else: 
           statsFrags[entryid]["cov2"][iPos_r2] = 1
+            
+              
+       if coflag==True and (lt30>0 or gt30>0):
+           iPos_r2="XX"
+           if R2_flag == "0":           
+              iPos_r2 = "F:"+ str(frg_r2[2] - R2_start)
+           if R2_flag == "16": 
+              iPos_r2 = "R:"+ str(R2_end - frg_r2[1])
+           iPos_r2= entryid2+":"+iPos_r2
+           #print(iPos_r2)
+           if iPos_r2 in statsFrags[entryid]["cov3"]:
+              statsFrags[entryid]["cov3"][iPos_r2] += 1
+           else: 
+              statsFrags[entryid]["cov3"][iPos_r2] = 1
+
 
     #----------------------------------------------------------------------------------End of the important cttoc calculation---------------------------------------------------
     
@@ -841,9 +858,10 @@ for x in statsFrags:
         
         
         if Ischimeric_count <1 and Ischimeric_count_ext <1 and frag !='HG19:chr8:128745989+10995':
+            cov2value_chimeric = len(list(v for k,v in frgStats["cov3"].items() if item in k))
             Ischimeric_flag=True
             if(int(R2_GT30)>0 or int(R2_LT30)>0 ):
-                both_ctpos = (cov2value)
+                both_ctpos = (cov2value_chimeric)
                 R2_ctToT_val_c = R2_ctToT_val + LT30+GT30
                 out_chimeric.write( "\t".join(map(str,[samp, frag, chromo, FragStart,FragEnd,R2_frag_info,R2_frag_info.split(":")[1],R2_frg_start,R2_frg_end,(int(R2_GT30)+int(R2_LT30)),both_ctpos])) + "\n")
         else:
